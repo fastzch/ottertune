@@ -14,6 +14,10 @@ from website.utils import ConversionUtil
 
 class PostgresParser(BaseParser):
 
+    def __init__(self, dbmsid):
+        super(PostgresParser, self).__init__(dbmsid)
+        self.valid_boolean_val = ["on", "off", "true", "false", "yes", "no", 0, 1]
+
     POSTGRES_BYTES_SYSTEM = [
         (1024 ** 5, 'PB'),
         (1024 ** 4, 'TB'),
@@ -107,4 +111,3 @@ class Postgres96Parser(PostgresParser):
         dbms = DBMSCatalog.objects.get(
             type=DBMSType.POSTGRES, version='9.6')
         super(Postgres96Parser, self).__init__(dbms.pk)
-        self.valid_boolean_val = ["on", "off", "true", "false", "yes", "no", 0, 1]

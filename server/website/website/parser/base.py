@@ -80,6 +80,7 @@ class BaseParser(object):
     def convert_dbms_knobs(self, knobs):
         knob_data = {}
         for name, metadata in self.tunable_knob_catalog_.iteritems():
+            #print "knob_name={}, minval={}, maxval={}".format(name, metadata)
             if metadata.tunable is False:
                 continue
             if name not in knobs:
@@ -94,19 +95,11 @@ class BaseParser(object):
                 conv_value = self.convert_enum(value, metadata)
             elif metadata.vartype == VarType.INTEGER:
                 conv_value = self.convert_integer(value, metadata)
-                if not self._check_knob_num_in_range(conv_value):
-                    logmsg = str(conv_value)
-                    log.warn(logmsg)
-                    logmsg2 = str(KnobCatalog.maxval)
-                    log.warn(logmsg2)
+                if not self._check_knob_num_in_range(metadata,conv_value):
                     raise Exception('Knob num value not in range!')
             elif metadata.vartype == VarType.REAL:
                 conv_value = self.convert_real(value, metadata)
-                if not self._check_knob_num_in_range(conv_value):
-                    logmsg = str(conv_value)
-                    log.warn(logmsg)
-                    logmsg2 = str(KnobCatalog.maxval)
-                    log.warn(logmsg2)
+                if not self._check_knob_num_in_range(metadata,conv_value):
                     raise Exception('Knob num value not in range!')
             elif metadata.vartype == VarType.STRING:
                 conv_value = self.convert_string(value, metadata)
@@ -121,8 +114,8 @@ class BaseParser(object):
             knob_data[name] = conv_value
         return knob_data
 
-    def _check_knob_num_in_range(self, value):
-        return value >= KnobCatalog.minval and value <= KnobCatalog.maxval
+    def _check_knob_num_in_range(self, mdata, value):
+        return value >= mdata.minval and value <= mdata.maxval
 
     def add_valid_boolean_val(self, new_val):
         self.valid_boolean_val.append(new_val)
