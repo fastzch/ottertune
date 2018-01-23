@@ -115,7 +115,7 @@ class BaseParser(object):
         return knob_data
 
     def _check_knob_num_in_range(self, mdata, value):
-        return value >= mdata.minval and value <= mdata.maxval
+        return value >= float(mdata.minval) and value <= float(mdata.maxval)
 
     def add_valid_boolean_val(self, new_val):
         self.valid_boolean_val.append(new_val)
