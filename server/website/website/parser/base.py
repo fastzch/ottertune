@@ -96,7 +96,7 @@ class BaseParser(object):
             elif metadata.vartype == VarType.INTEGER:
                 conv_value = self.convert_integer(value, metadata)
                 if not self._check_knob_num_in_range(metadata, conv_value):
-                    raise Exception('Knob num value not in range! conv_value={}, minval={}, maxval={}'.format(conv_value, metadata.minval, metadata.maxval))
+                    raise Exception('Knob num value not in range!')
             elif metadata.vartype == VarType.REAL:
                 conv_value = self.convert_real(value, metadata)
                 if not self._check_knob_num_in_range(metadata, conv_value):
