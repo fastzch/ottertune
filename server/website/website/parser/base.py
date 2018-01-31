@@ -14,9 +14,6 @@ from website.models import KnobCatalog, MetricCatalog
 from website.settings import CONFIG_DIR
 from website.types import BooleanType, MetricType, VarType
 
-import logging
-log = logging.getLogger(__name__)
-
 class BaseParser(object):
 
     __metaclass__ = ABCMeta
@@ -77,10 +74,15 @@ class BaseParser(object):
     def convert_timestamp(self, timestamp_value, metadata):
         raise NotImplementedError('Implement me!')
 
+    def valid_boolean_val_to_string(self):
+        str = ''
+        for bval in self.valid_boolean_val:
+            str += str(bval) + ' '
+        return str
+
     def convert_dbms_knobs(self, knobs):
         knob_data = {}
         for name, metadata in self.tunable_knob_catalog_.iteritems():
-            #print "knob_name={}, minval={}, maxval={}".format(name, metadata)
             if metadata.tunable is False:
                 continue
             if name not in knobs:
@@ -88,19 +90,28 @@ class BaseParser(object):
             value = knobs[name]
             conv_value = None
             if metadata.vartype == VarType.BOOL:
+                if not self._check_knob_bool_val(value):
+                    raise Exception('Knob boolean value not valid! '
+                                    'Boolean values should be one of: {}, '
+                                    'but the actual value is: {}'
+                                    .format(self.valid_boolean_val, str(value)))
                 conv_value = self.convert_bool(value, metadata)
-                if not self._check_knob_bool_val(conv_value):
-                    raise Exception('Knob boolean value not valid!')
             elif metadata.vartype == VarType.ENUM:
                 conv_value = self.convert_enum(value, metadata)
             elif metadata.vartype == VarType.INTEGER:
                 conv_value = self.convert_integer(value, metadata)
-                if not self._check_knob_num_in_range(metadata, conv_value):
-                    raise Exception('Knob num value not in range!')
+                if not self._check_knob_num_in_range(conv_value, metadata):
+                    raise Exception('Knob integer num value not in range! '
+                                    'min: {}, max: {}, actual: {}'
+                                    .format(metadata.minval,
+                                            metadata.maxval, str(conv_value)))
             elif metadata.vartype == VarType.REAL:
                 conv_value = self.convert_real(value, metadata)
-                if not self._check_knob_num_in_range(metadata, conv_value):
-                    raise Exception('Knob num value not in range!')
+                if not self._check_knob_num_in_range(conv_value, metadata):
+                    raise Exception('Knob real num value not in range! '
+                                    'min: {}, max: {}, actual: {}'
+                                    .format(metadata.minval,
+                                            metadata.maxval, str(conv_value)))
             elif metadata.vartype == VarType.STRING:
                 conv_value = self.convert_string(value, metadata)
             elif metadata.vartype == VarType.TIMESTAMP:
@@ -114,11 +125,8 @@ class BaseParser(object):
             knob_data[name] = conv_value
         return knob_data
 
-    def _check_knob_num_in_range(self, mdata, value):
+    def _check_knob_num_in_range(self, value, mdata):
         return value >= float(mdata.minval) and value <= float(mdata.maxval)
-
-    def add_valid_boolean_val(self, new_val):
-        self.valid_boolean_val.append(new_val)
 
     def _check_knob_bool_val(self, value):
         return value in self.valid_boolean_val

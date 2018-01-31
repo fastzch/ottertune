@@ -14,8 +14,8 @@ from website.utils import ConversionUtil
 
 class PostgresParser(BaseParser):
 
-    def __init__(self, dbmsid):
-        super(PostgresParser, self).__init__(dbmsid)
+    def __init__(self, dbms_id):
+        super(PostgresParser, self).__init__(dbms_id)
         self.valid_boolean_val = ["on", "off", "true", "false", "yes", "no", 0, 1]
 
     POSTGRES_BYTES_SYSTEM = [
