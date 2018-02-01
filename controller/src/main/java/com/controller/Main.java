@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.MalformedParametersException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Controller main.
@@ -74,9 +75,6 @@ public class Main {
             case MYSQL:
                 collector = new MySQLCollector(controllerConfiguration.getDatabaseUrl(), controllerConfiguration.getUsername(), controllerConfiguration.getPassword());
                 break;
-            case "mysql":
-                collector = new MySQLCollector(dbURL, username, password);
-                break;
             default:
                 logger.error("Invalid database type");
                 throw new MalformedParametersException("invalid database type");
@@ -134,6 +132,7 @@ public class Main {
             logger.error("Failed to produce output files");
             e.printStackTrace();
         }
+
         Map<String, String> outfiles = new HashMap<>();
         outfiles.put("knobs", outputDirName + "/" + outputDir + "/knobs.json");
         outfiles.put("metrics_before", outputDirName + "/"+ outputDir + "/metrics_before.json");
