@@ -29,7 +29,8 @@ class BaseParser(object):
         self.numeric_metric_catalog_ = {m: v for m, v in \
                 self.metric_catalog_.iteritems() if \
                 v.metric_type == MetricType.COUNTER}
-        self.valid_boolean_val = list()
+        self.valid_true_val = list()
+        self.valid_false_val = list()
 
     @abstractproperty
     def base_configuration_settings(self):
@@ -75,10 +76,13 @@ class BaseParser(object):
         raise NotImplementedError('Implement me!')
 
     def valid_boolean_val_to_string(self):
-        str = ''
-        for bval in self.valid_boolean_val:
-            str += str(bval) + ' '
-        return str
+        str_true = 'valid true values: '
+        for bval in self.valid_true_val:
+            str_true += str(bval) + ' '
+        str_false = 'valid false values: '
+        for bval in self.valid_false_val:
+            str_false += str(bval) + ' '
+        return str_true + '; ' + str_false
 
     def convert_dbms_knobs(self, knobs):
         knob_data = {}
@@ -94,7 +98,7 @@ class BaseParser(object):
                     raise Exception('Knob boolean value not valid! '
                                     'Boolean values should be one of: {}, '
                                     'but the actual value is: {}'
-                                    .format(self.valid_boolean_val, str(value)))
+                                    .format(self.valid_boolean_val_to_string(), str(value)))
                 conv_value = self.convert_bool(value, metadata)
             elif metadata.vartype == VarType.ENUM:
                 conv_value = self.convert_enum(value, metadata)
@@ -129,7 +133,7 @@ class BaseParser(object):
         return value >= float(mdata.minval) and value <= float(mdata.maxval)
 
     def _check_knob_bool_val(self, value):
-        return value in self.valid_boolean_val
+        return value in self.valid_true_val or value in self.valid_false_val
 
     def convert_dbms_metrics(self, metrics, observation_time):
 #         if len(metrics) != len(self.numeric_metric_catalog_):
