@@ -4,10 +4,7 @@ import com.controller.util.JSONUtil;
 import com.controller.util.json.JSONException;
 import com.controller.util.json.JSONObject;
 import com.controller.util.json.JSONStringer;
-<<<<<<< HEAD
-=======
 import org.apache.log4j.Logger;
->>>>>>> 026eaae9f7846dec31ee08ba29fe2cee97f1d599
 
 import java.sql.*;
 
